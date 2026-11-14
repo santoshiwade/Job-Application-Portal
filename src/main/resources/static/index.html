@@ -1,0 +1,460 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Portal | Find Your Next Job</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 22px 8%;
+        }
+
+        .site-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            font-size: 26px;
+        }
+
+        header p {
+            margin-top: 8px;
+            color: #dbeafe;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .auth-buttons button {
+            background: white;
+            color: #172554;
+            font-weight: bold;
+        }
+
+        .auth-buttons button:hover {
+            background: #dbeafe;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 45px 20px 30px;
+        }
+
+        .hero h2 {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .hero > p {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        input {
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            width: 260px;
+            font-size: 15px;
+            background: white;
+        }
+
+        input:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+
+        .reset-button {
+            background: #64748b;
+        }
+
+        .reset-button:hover {
+            background: #475569;
+        }
+
+        .jobs-section {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 20px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        #jobCount {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        #jobs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 20px;
+        }
+
+        .job-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .job-card h3 {
+            color: #1d4ed8;
+            margin-bottom: 12px;
+        }
+
+        .company {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .job-info {
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            line-height: 1.5;
+            margin: 15px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .salary {
+            font-weight: bold;
+            color: #15803d;
+            margin-bottom: 18px;
+        }
+
+        .job-card button {
+            margin-top: auto;
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 35px;
+            color: #64748b;
+            background: white;
+            border-radius: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            .site-header {
+                align-items: flex-start;
+            }
+
+            .auth-buttons {
+                width: 100%;
+            }
+
+            .hero h2 {
+                font-size: 25px;
+            }
+
+            .search-box input,
+            .search-box button {
+                width: 100%;
+            }
+
+            .section-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div>
+        <h1>JobPortal</h1>
+        <p>Connecting talent with opportunity</p>
+    </div>
+
+    <nav class="auth-buttons">
+        <button onclick="window.location.href='login.html'">
+            Login
+        </button>
+        <button onclick="window.location.href='register.html'">
+            Register
+        </button>
+    </nav>
+</header>
+
+<section class="hero">
+    <h2>Find Your Dream Job</h2>
+    <p>Explore opportunities and take the next step in your career.</p>
+
+    <form class="search-box" id="searchForm">
+        <input
+            id="titleSearch"
+            type="text"
+            placeholder="Job title or company"
+            aria-label="Search by job title or company"
+        >
+
+        <input
+            id="locationSearch"
+            type="text"
+            placeholder="Location, e.g. Pune"
+            aria-label="Filter by location"
+        >
+
+        <button type="submit">Search Jobs</button>
+
+        <button type="button" class="reset-button" id="resetButton">
+            Reset
+        </button>
+    </form>
+</section>
+
+<section class="jobs-section">
+    <div class="section-heading">
+        <h2 id="resultsHeading">Available Jobs</h2>
+        <span id="jobCount" aria-live="polite">Loading jobs...</span>
+    </div>
+
+    <div id="jobs" aria-live="polite"></div>
+</section>
+
+<footer>
+    © 2026 JobPortal | Built with Java, Spring Boot and MySQL
+</footer>
+
+<script>
+    const API_URL = "/api/jobs";
+
+    const searchForm = document.getElementById("searchForm");
+    const titleInput = document.getElementById("titleSearch");
+    const locationInput = document.getElementById("locationSearch");
+    const resetButton = document.getElementById("resetButton");
+
+    searchForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        searchJobs();
+    });
+
+    resetButton.addEventListener("click", function() {
+        titleInput.value = "";
+        locationInput.value = "";
+        loadJobs();
+    });
+
+    async function loadJobs() {
+        document.getElementById("resultsHeading").textContent =
+            "Available Jobs";
+
+        await fetchJobs(API_URL);
+    }
+
+    async function searchJobs() {
+        const keyword = titleInput.value.trim();
+        const location = locationInput.value.trim();
+
+        if (!keyword && !location) {
+            await loadJobs();
+            return;
+        }
+
+        const params = new URLSearchParams();
+
+        if (keyword) {
+            params.append("keyword", keyword);
+        }
+
+        if (location) {
+            params.append("location", location);
+        }
+
+        document.getElementById("resultsHeading").textContent =
+            "Search Results";
+
+        await fetchJobs(API_URL + "/search?" + params.toString());
+    }
+
+    async function getJobs(url) {
+        try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error("Request failed: " + response.status);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Job request failed:", error);
+            showError();
+            return null;
+        }
+    }
+
+    async function fetchJobs(url) {
+        document.getElementById("jobCount").textContent =
+            "Loading jobs...";
+
+        document.getElementById("jobs").innerHTML = "";
+
+        const jobs = await getJobs(url);
+
+        if (jobs !== null) {
+            if (!Array.isArray(jobs)) {
+                showError();
+                return;
+            }
+
+            displayJobs(jobs);
+        }
+    }
+
+    function displayJobs(jobs) {
+        const container = document.getElementById("jobs");
+
+        document.getElementById("jobCount").textContent =
+            jobs.length + (jobs.length === 1
+                ? " job found"
+                : " jobs found");
+
+        if (jobs.length === 0) {
+            container.innerHTML =
+                '<div class="empty">No jobs found. Try different keywords or location.</div>';
+            return;
+        }
+
+        container.innerHTML = jobs.map(job => `
+            <article class="job-card">
+                <h3>${escapeHtml(job.title || "Untitled Job")}</h3>
+
+                <p class="company">
+                    ${escapeHtml(job.company || "Company not specified")}
+                </p>
+
+                <p class="job-info">
+                    📍 ${escapeHtml(job.location || "Location not specified")}
+                </p>
+
+                <p class="description">
+                    ${escapeHtml(job.description || "No description available.")}
+                </p>
+
+                <p class="salary">
+                    ${job.salary != null && job.salary !== ""
+                        ? "Salary: " + escapeHtml(job.salary)
+                        : "Salary not specified"}
+                </p>
+
+                <button
+                    type="button"
+                    onclick="viewJob(${Number(job.id)})"
+                >
+                    View Details
+                </button>
+            </article>
+        `).join("");
+    }
+
+    async function viewJob(id) {
+        if (!Number.isSafeInteger(id) || id <= 0) {
+            alert("Invalid job ID.");
+            return;
+        }
+
+        const job = await getJobs(API_URL + "/" + id);
+
+        if (!job) {
+            return;
+        }
+
+        alert(
+            "Job: " + (job.title || "Not specified") +
+            "\nCompany: " + (job.company || "Not specified") +
+            "\nLocation: " + (job.location || "Not specified") +
+            "\nSalary: " + (job.salary ?? "Not specified") +
+            "\n\nDescription: " + (job.description || "Not specified")
+        );
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+    }
+
+    function showError() {
+        document.getElementById("jobCount").textContent = "Unable to load jobs";
+
+        document.getElementById("jobs").innerHTML =
+            '<div class="empty">Unable to load jobs. Check that the Spring Boot application is running, then refresh the page.</div>';
+    }
+
+    loadJobs();
+</script>
+
+</body>
+</html>

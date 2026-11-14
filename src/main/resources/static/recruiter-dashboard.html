@@ -1,0 +1,580 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Dashboard | JobPortal</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #263238;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h2 { margin: 0; }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .welcome, .panel {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .welcome h1 { margin-top: 0; }
+
+        .job-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .full-width { grid-column: 1 / -1; }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font: inherit;
+            background: white;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 11px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .primary { background: #2563eb; color: white; }
+        .secondary { background: #e2e8f0; color: #172554; }
+        .logout { background: #ef4444; color: white; }
+
+        .job-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 18px;
+            border-radius: 9px;
+            margin-top: 14px;
+        }
+
+        .job-card h3 { margin-top: 0; margin-bottom: 8px; }
+
+        .job-card p {
+            margin: 7px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .message { margin-top: 12px; font-weight: bold; }
+        .muted { color: #64748b; }
+
+        .applicants-section {
+            margin-top: 18px;
+            padding-top: 15px;
+            border-top: 1px solid #cbd5e1;
+        }
+
+        .applicant-card {
+            background: white;
+            border: 1px solid #dbe3ee;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 12px;
+        }
+
+        .applicant-card h4 { margin: 0 0 10px; }
+
+        .applicant-card p {
+            margin: 7px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .status-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-form select {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .status-form button { flex-shrink: 0; }
+
+        .status-message {
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 650px) {
+            header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .job-form { grid-template-columns: 1fr; }
+            .full-width { grid-column: auto; }
+            .status-form { align-items: stretch; flex-direction: column; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>JobPortal | Recruiter</h2>
+
+    <div class="header-right">
+        <span id="recruiterName">Recruiter</span>
+        <button class="logout" id="logoutButton" type="button">
+            Logout
+        </button>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="welcome">
+        <h1>Recruiter Dashboard</h1>
+        <p>Post jobs, view applicants, and manage application statuses.</p>
+    </section>
+
+    <section class="panel">
+        <h2>Post a New Job</h2>
+
+        <form id="jobForm" class="job-form">
+            <input id="title" type="text"
+                   placeholder="Job Title" required>
+
+            <input id="company" type="text"
+                   placeholder="Company Name" required>
+
+            <input id="location" type="text"
+                   placeholder="Job Location" required>
+
+            <input id="salary" type="number" min="0" step="0.01"
+                   placeholder="Salary (optional)">
+
+            <textarea id="description" class="full-width"
+                      placeholder="Job Description" required></textarea>
+
+            <button class="primary full-width" type="submit">
+                Post Job
+            </button>
+        </form>
+
+        <p id="formMessage" class="message" role="status"></p>
+    </section>
+
+    <section class="panel">
+        <h2>My Job Listings</h2>
+
+        <button id="refreshButton" class="secondary" type="button">
+            Refresh Jobs
+        </button>
+
+        <p id="jobsMessage" class="muted" role="status"></p>
+        <div id="jobsContainer"></div>
+    </section>
+
+</main>
+
+<script>
+    let recruiterUser;
+
+    try {
+        recruiterUser = JSON.parse(
+            sessionStorage.getItem("recruiterUser")
+        );
+    } catch (error) {
+        recruiterUser = null;
+    }
+
+    if (
+        !recruiterUser ||
+        !recruiterUser.id ||
+        String(recruiterUser.role).toUpperCase() !== "RECRUITER"
+    ) {
+        window.location.replace("login.html");
+    } else {
+        initializeDashboard();
+    }
+
+    function initializeDashboard() {
+        document.getElementById("recruiterName").textContent =
+            recruiterUser.name || recruiterUser.email || "Recruiter";
+
+        document.getElementById("logoutButton").addEventListener(
+            "click", function () {
+                sessionStorage.removeItem("recruiterUser");
+                window.location.replace("login.html");
+            }
+        );
+
+        document.getElementById("jobForm").addEventListener(
+            "submit", postJob
+        );
+
+        document.getElementById("refreshButton").addEventListener(
+            "click", loadMyJobs
+        );
+
+        loadMyJobs();
+    }
+
+    async function postJob(event) {
+        event.preventDefault();
+
+        const message = document.getElementById("formMessage");
+        const salaryInput = document.getElementById("salary").value.trim();
+
+        const job = {
+            title: document.getElementById("title").value.trim(),
+            company: document.getElementById("company").value.trim(),
+            location: document.getElementById("location").value.trim(),
+            description: document.getElementById("description").value.trim(),
+            recruiterId: recruiterUser.id
+        };
+
+        if (salaryInput !== "") {
+            job.salary = Number(salaryInput);
+        }
+
+        message.textContent = "Posting job...";
+
+        try {
+            const response = await fetch("/api/jobs", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(job)
+            });
+
+            if (!response.ok) {
+                throw new Error(await response.text() ||
+                    "Could not post the job.");
+            }
+
+            message.textContent = "Job posted successfully!";
+            document.getElementById("jobForm").reset();
+            await loadMyJobs();
+
+        } catch (error) {
+            message.textContent = "Error posting job: " + error.message;
+        }
+    }
+
+    async function loadMyJobs() {
+        const container = document.getElementById("jobsContainer");
+        const message = document.getElementById("jobsMessage");
+
+        container.replaceChildren();
+        message.textContent = "Loading jobs...";
+
+        try {
+            const response = await fetch("/api/jobs");
+
+            if (!response.ok) {
+                throw new Error("Could not load jobs.");
+            }
+
+            const jobs = await response.json();
+
+            const myJobs = jobs.filter(function (job) {
+                return String(job.recruiterId) ===
+                    String(recruiterUser.id);
+            });
+
+            message.textContent = myJobs.length
+                ? "You have posted " + myJobs.length + " job(s)."
+                : "You have not posted any jobs yet.";
+
+            myJobs.forEach(function (job) {
+                const card = document.createElement("article");
+                card.className = "job-card";
+
+                const title = document.createElement("h3");
+                title.textContent = job.title || "Untitled Job";
+
+                const company = document.createElement("p");
+                company.textContent = "Company: " + (job.company || "—");
+
+                const location = document.createElement("p");
+                location.textContent = "Location: " + (job.location || "—");
+
+                const salary = document.createElement("p");
+                salary.textContent = "Salary: " +
+                    (job.salary != null ? job.salary : "Not specified");
+
+                const description = document.createElement("p");
+                description.textContent =
+                    "Description: " + (job.description || "—");
+
+                const jobId = document.createElement("p");
+                jobId.textContent = "Job ID: " + job.id;
+
+                const viewButton = document.createElement("button");
+                viewButton.type = "button";
+                viewButton.className = "primary";
+                viewButton.textContent = "View Applicants";
+
+                const applicantsSection = document.createElement("section");
+                applicantsSection.className = "applicants-section";
+                applicantsSection.hidden = true;
+
+                const applicantsHeading = document.createElement("h4");
+                applicantsHeading.textContent = "Applicants";
+
+                const applicantsMessage = document.createElement("p");
+                applicantsMessage.className = "muted";
+                applicantsMessage.setAttribute("role", "status");
+
+                const applicantsContainer = document.createElement("div");
+
+                applicantsSection.append(
+                    applicantsHeading,
+                    applicantsMessage,
+                    applicantsContainer
+                );
+
+                viewButton.addEventListener("click", async function () {
+                    applicantsSection.hidden = false;
+                    viewButton.disabled = true;
+                    viewButton.textContent = "Loading...";
+
+                    await loadApplicants(
+                        job.id,
+                        applicantsContainer,
+                        applicantsMessage
+                    );
+
+                    viewButton.disabled = false;
+                    viewButton.textContent = "Refresh Applicants";
+                });
+
+                card.append(
+                    title, company, location, salary,
+                    description, jobId, viewButton, applicantsSection
+                );
+
+                container.appendChild(card);
+            });
+
+        } catch (error) {
+            message.textContent = "Error loading jobs: " + error.message;
+        }
+    }
+
+    async function loadApplicants(jobId, container, message) {
+        container.replaceChildren();
+        message.textContent = "Loading applicants...";
+
+        try {
+            // Fetch the applicant details DTO from the new API endpoint.
+            const response = await fetch(
+                "/api/applications/job/" +
+                encodeURIComponent(jobId) + "/details"
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Could not load applicants. HTTP " + response.status
+                );
+            }
+
+            const applications = await response.json();
+
+            if (!Array.isArray(applications) || applications.length === 0) {
+                message.textContent = "No applicants for this job yet.";
+                return;
+            }
+
+            message.textContent =
+                "Total applicants: " + applications.length;
+
+            applications.forEach(function (application) {
+                const card = document.createElement("article");
+                card.className = "applicant-card";
+
+                const heading = document.createElement("h4");
+                heading.textContent = "Application #" + application.id;
+
+                // Display the candidate's actual name.
+                const candidate = document.createElement("p");
+                candidate.textContent =
+                    "Candidate: " +
+                    (application.candidateName || "Name not available");
+
+                // Display the candidate's email address.
+                const email = document.createElement("p");
+                email.textContent =
+                    "Email: " +
+                    (application.candidateEmail || "Email not available");
+
+                const appliedDate = document.createElement("p");
+                let dateText = "Not available";
+
+                if (application.appliedAt) {
+                    const date = new Date(application.appliedAt);
+
+                    if (!Number.isNaN(date.getTime())) {
+                        dateText = date.toLocaleString();
+                    }
+                }
+
+                appliedDate.textContent = "Applied: " + dateText;
+
+                const currentStatus = document.createElement("p");
+                currentStatus.textContent =
+                    "Current status: " +
+                    (application.status || "PENDING");
+
+                const form = document.createElement("div");
+                form.className = "status-form";
+
+                const select = document.createElement("select");
+                select.setAttribute(
+                    "aria-label",
+                    "Status for application " + application.id
+                );
+
+                ["PENDING", "SHORTLISTED", "REJECTED"].forEach(
+                    function (status) {
+                        const option = document.createElement("option");
+                        option.value = status;
+                        option.textContent = status;
+                        select.appendChild(option);
+                    }
+                );
+
+                const existingStatus =
+                    String(application.status || "PENDING").toUpperCase();
+
+                if (["PENDING", "SHORTLISTED", "REJECTED"].includes(
+                    existingStatus
+                )) {
+                    select.value = existingStatus;
+                }
+
+                const saveButton = document.createElement("button");
+                saveButton.type = "button";
+                saveButton.className = "primary";
+                saveButton.textContent = "Save Status";
+
+                const statusMessage = document.createElement("p");
+                statusMessage.className = "status-message";
+                statusMessage.setAttribute("role", "status");
+
+                // Preserve the existing status-update functionality.
+                saveButton.addEventListener("click", async function () {
+                    saveButton.disabled = true;
+                    select.disabled = true;
+                    statusMessage.textContent = "Saving status...";
+
+                    try {
+                        const url =
+                            "/api/applications/" +
+                            encodeURIComponent(application.id) +
+                            "/status?status=" +
+                            encodeURIComponent(select.value);
+
+                        const updateResponse = await fetch(url, {
+                            method: "PUT"
+                        });
+
+                        if (!updateResponse.ok) {
+                            throw new Error(
+                                await updateResponse.text() ||
+                                "Could not update status."
+                            );
+                        }
+
+                        const updatedApplication =
+                            await updateResponse.json();
+
+                        currentStatus.textContent =
+                            "Current status: " +
+                            updatedApplication.status;
+
+                        application.status = updatedApplication.status;
+                        select.value = updatedApplication.status;
+
+                        statusMessage.textContent =
+                            "Status updated successfully!";
+
+                    } catch (error) {
+                        statusMessage.textContent =
+                            "Error: " + error.message;
+                    } finally {
+                        saveButton.disabled = false;
+                        select.disabled = false;
+                    }
+                });
+
+                form.append(select, saveButton);
+
+                card.append(
+                    heading,
+                    candidate,
+                    email,
+                    appliedDate,
+                    currentStatus,
+                    form,
+                    statusMessage
+                );
+
+                container.appendChild(card);
+            });
+
+        } catch (error) {
+            message.textContent =
+                "Error loading applicants: " + error.message;
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,718 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Dashboard | JobPortal</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        header {
+            background: #ffffff;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .profile {
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #6b7280;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 12px #00000008;
+        }
+
+        .search-box input {
+            flex: 1;
+            min-width: 180px;
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 12px 18px;
+            background: #2563eb;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            gap: 12px;
+        }
+
+        #jobCount,
+        #applicationCount {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        #jobList,
+        #applicationList {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .job-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 23px;
+            box-shadow: 0 3px 12px #00000006;
+            overflow-wrap: anywhere;
+        }
+
+        .job-card h3 {
+            font-size: 19px;
+            margin-bottom: 9px;
+        }
+
+        .company {
+            color: #4b5563;
+            margin-bottom: 16px;
+        }
+
+        .job-info {
+            color: #6b7280;
+            font-size: 14px;
+            margin: 10px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .salary {
+            color: #15803d;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .details-btn {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .details-btn:hover {
+            background: #dbeafe;
+        }
+
+        .apply-btn {
+            background: #198754;
+            color: white;
+        }
+
+        .apply-btn:hover {
+            background: #146c43;
+        }
+
+        .status {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .message {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        dialog {
+            border: none;
+            border-radius: 12px;
+            padding: 28px;
+            width: min(520px, 90%);
+            margin: auto;
+            box-shadow: 0 15px 50px #00000025;
+        }
+
+        dialog::backdrop {
+            background: #11182799;
+        }
+
+        dialog h2 {
+            margin-bottom: 12px;
+        }
+
+        dialog p {
+            margin: 12px 0;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .close-btn {
+            margin-top: 15px;
+            background: #4b5563;
+        }
+
+        @media (max-width: 600px) {
+            .welcome h1 {
+                font-size: 24px;
+            }
+
+            header {
+                padding: 16px 20px;
+                flex-wrap: wrap;
+            }
+
+            .header-actions {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .section-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">JobPortal</div>
+
+    <div class="header-actions">
+        <div class="profile" id="candidateName">Candidate Dashboard</div>
+        <button type="button" class="logout-btn" id="logoutButton">
+            Logout
+        </button>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="welcome">
+        <h1>Find your next opportunity</h1>
+        <p>Explore jobs and discover opportunities that match your skills.</p>
+    </section>
+
+    <section class="search-box">
+        <input
+            type="text"
+            id="titleSearch"
+            placeholder="Search job title or company"
+        >
+
+        <input
+            type="text"
+            id="locationSearch"
+            placeholder="Location, e.g. Pune"
+        >
+
+        <button type="button" id="searchJobsButton">Search Jobs</button>
+        <button type="button" id="resetSearchButton">Reset</button>
+    </section>
+
+    <section class="section">
+        <div class="section-heading">
+            <h2>Available Jobs</h2>
+            <span id="jobCount">Loading jobs...</span>
+        </div>
+
+        <div id="jobList">
+            <div class="message">Loading available jobs...</div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-heading">
+            <h2>My Applications</h2>
+
+            <button
+                type="button"
+                id="refreshApplicationsButton"
+            >
+                Refresh Applications
+            </button>
+        </div>
+
+        <div id="applicationCount" style="margin-bottom: 15px;">
+            Loading applications...
+        </div>
+
+        <div id="applicationList">
+            <div class="message">Loading your applications...</div>
+        </div>
+    </section>
+
+</main>
+
+<dialog id="jobDialog">
+    <h2 id="detailTitle"></h2>
+    <p id="detailCompany"></p>
+    <p id="detailLocation"></p>
+    <p id="detailSalary"></p>
+    <p id="detailDescription"></p>
+
+    <button type="button" id="dialogApplyButton" class="apply-btn">
+        Apply Now
+    </button>
+
+    <button type="button" id="closeDialogButton" class="close-btn">
+        Close
+    </button>
+</dialog>
+
+<script>
+    // Check the candidate stored by the login page.
+    let candidateUser;
+
+    try {
+        candidateUser = JSON.parse(
+            sessionStorage.getItem("candidateUser") || "null"
+        );
+    } catch (error) {
+        candidateUser = null;
+    }
+
+    // Redirect users who are not logged in as candidates.
+    if (
+        !candidateUser ||
+        candidateUser.id == null ||
+        typeof candidateUser.role !== "string" ||
+        candidateUser.role.toUpperCase() !== "CANDIDATE"
+    ) {
+        window.location.replace("login.html");
+    } else {
+        initializeDashboard();
+    }
+
+    function initializeDashboard() {
+        const candidateId = candidateUser.id;
+        let allJobs = [];
+        let selectedJobId = null;
+
+        document.getElementById("candidateName").textContent =
+            "Welcome, " + (candidateUser.name || "Candidate");
+
+        // Logout
+        document.getElementById("logoutButton").addEventListener("click", function() {
+            sessionStorage.removeItem("candidateUser");
+            window.location.replace("login.html");
+        });
+
+        // Search and refresh controls
+        document.getElementById("searchJobsButton").addEventListener(
+            "click", filterJobs
+        );
+
+        document.getElementById("resetSearchButton").addEventListener(
+            "click", loadJobs
+        );
+
+        document.getElementById("refreshApplicationsButton").addEventListener(
+            "click", loadMyApplications
+        );
+
+        document.getElementById("closeDialogButton").addEventListener(
+            "click", closeDetails
+        );
+
+        document.getElementById("dialogApplyButton").addEventListener(
+            "click", function() {
+                if (selectedJobId !== null) {
+                    applyForJob(selectedJobId);
+                }
+            }
+        );
+
+        // Load jobs from the Spring Boot API.
+        async function loadJobs() {
+            const jobList = document.getElementById("jobList");
+            const jobCount = document.getElementById("jobCount");
+
+            document.getElementById("titleSearch").value = "";
+            document.getElementById("locationSearch").value = "";
+
+            jobList.innerHTML =
+                '<div class="message">Loading available jobs...</div>';
+            jobCount.textContent = "Loading jobs...";
+
+            try {
+                const response = await fetch("/api/jobs");
+
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status);
+                }
+
+                const data = await response.json();
+
+                if (!Array.isArray(data)) {
+                    throw new Error("Jobs API did not return a list.");
+                }
+
+                allJobs = data;
+                displayJobs(allJobs);
+            } catch (error) {
+                console.error("Error loading jobs:", error);
+
+                jobList.innerHTML =
+                    '<div class="message">Unable to load jobs. Please try again.</div>';
+
+                jobCount.textContent = "Could not load jobs";
+            }
+        }
+
+        // Filter jobs by title, company and location.
+        function filterJobs() {
+            const title = document.getElementById("titleSearch")
+                .value.trim().toLowerCase();
+
+            const location = document.getElementById("locationSearch")
+                .value.trim().toLowerCase();
+
+            const filteredJobs = allJobs.filter(job => {
+                const jobTitle = (job.title || "").toLowerCase();
+                const jobCompany = (job.company || "").toLowerCase();
+                const jobLocation = (job.location || "").toLowerCase();
+
+                const matchesTitle =
+                    jobTitle.includes(title) ||
+                    jobCompany.includes(title);
+
+                const matchesLocation = jobLocation.includes(location);
+
+                return matchesTitle && matchesLocation;
+            });
+
+            displayJobs(filteredJobs);
+        }
+
+        // Create job cards safely using DOM elements.
+        function displayJobs(jobs) {
+            const jobList = document.getElementById("jobList");
+            const jobCount = document.getElementById("jobCount");
+
+            jobCount.textContent =
+                jobs.length + (jobs.length === 1 ? " job found" : " jobs found");
+
+            if (jobs.length === 0) {
+                jobList.innerHTML =
+                    '<div class="message">No jobs found. Try another search.</div>';
+                return;
+            }
+
+            jobList.innerHTML = "";
+
+            jobs.forEach(job => {
+                const card = document.createElement("article");
+                card.className = "job-card";
+
+                const title = document.createElement("h3");
+                title.textContent = job.title || "Untitled position";
+
+                const company = document.createElement("p");
+                company.className = "company";
+                company.textContent = job.company || "Company not specified";
+
+                const location = document.createElement("p");
+                location.className = "job-info";
+                location.textContent =
+                    "Location: " + (job.location || "Not specified");
+
+                const salary = document.createElement("p");
+                salary.className = "salary";
+                salary.textContent =
+                    "Salary: " + (job.salary || "Not specified");
+
+                const actions = document.createElement("div");
+                actions.className = "card-actions";
+
+                const detailsButton = document.createElement("button");
+                detailsButton.type = "button";
+                detailsButton.className = "details-btn";
+                detailsButton.textContent = "View Details";
+                detailsButton.addEventListener("click", () => showDetails(job));
+
+                const applyButton = document.createElement("button");
+                applyButton.type = "button";
+                applyButton.className = "apply-btn";
+                applyButton.textContent = "Apply Now";
+                applyButton.addEventListener(
+                    "click", () => applyForJob(job.id)
+                );
+
+                actions.append(detailsButton, applyButton);
+                card.append(title, company, location, salary, actions);
+                jobList.appendChild(card);
+            });
+        }
+
+        // Show the job details dialog.
+        function showDetails(job) {
+            selectedJobId = job.id;
+
+            document.getElementById("detailTitle").textContent =
+                job.title || "Untitled position";
+
+            document.getElementById("detailCompany").textContent =
+                "Company: " + (job.company || "Not specified");
+
+            document.getElementById("detailLocation").textContent =
+                "Location: " + (job.location || "Not specified");
+
+            document.getElementById("detailSalary").textContent =
+                "Salary: " + (job.salary || "Not specified");
+
+            document.getElementById("detailDescription").textContent =
+                "Description: " +
+                (job.description || "No description available.");
+
+            document.getElementById("jobDialog").showModal();
+        }
+
+        function closeDetails() {
+            const dialog = document.getElementById("jobDialog");
+
+            if (dialog.open) {
+                dialog.close();
+            }
+        }
+
+        // Submit a job application.
+        async function applyForJob(jobId) {
+            if (jobId === null || jobId === undefined) {
+                alert("Invalid job ID.");
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `/api/applications/apply?candidateId=${encodeURIComponent(candidateId)}&jobId=${encodeURIComponent(jobId)}`,
+                    { method: "POST" }
+                );
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+
+                    alert(
+                        "Application failed (HTTP " + response.status + ")." +
+                        (errorText ? "\n" + errorText : "")
+                    );
+                    return;
+                }
+
+                alert("Application submitted successfully!");
+                closeDetails();
+
+                await loadMyApplications();
+            } catch (error) {
+                console.error("Error applying for job:", error);
+                alert("Could not connect to the server. Please try again.");
+            }
+        }
+
+        // Load applications for the logged-in candidate.
+        async function loadMyApplications() {
+            const applicationList =
+                document.getElementById("applicationList");
+
+            const applicationCount =
+                document.getElementById("applicationCount");
+
+            const refreshButton =
+                document.getElementById("refreshApplicationsButton");
+
+            applicationList.innerHTML =
+                '<div class="message">Loading your applications...</div>';
+
+            applicationCount.textContent = "Loading applications...";
+            refreshButton.disabled = true;
+
+            try {
+                const response = await fetch(
+                    `/api/applications/candidate/${encodeURIComponent(candidateId)}`
+                );
+
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status);
+                }
+
+                const applications = await response.json();
+
+                if (!Array.isArray(applications)) {
+                    throw new Error("Applications API did not return a list.");
+                }
+
+                applicationCount.textContent =
+                    applications.length +
+                    (applications.length === 1
+                        ? " application"
+                        : " applications");
+
+                if (applications.length === 0) {
+                    applicationList.innerHTML =
+                        '<div class="message">You have not applied for any jobs yet.</div>';
+                    return;
+                }
+
+                applicationList.innerHTML = "";
+
+                for (const application of applications) {
+                    const card = document.createElement("article");
+                    card.className = "job-card";
+
+                    const heading = document.createElement("h3");
+                    heading.textContent = "Application #" + application.id;
+
+                    const jobInfo = document.createElement("p");
+                    jobInfo.className = "job-info";
+
+                    const matchingJob = allJobs.find(
+                        job => String(job.id) === String(application.jobId)
+                    );
+
+                    jobInfo.textContent = matchingJob
+                        ? "Job: " + matchingJob.title
+                        : "Job ID: " + application.jobId;
+
+                    const statusLabel = document.createElement("p");
+                    statusLabel.className = "job-info";
+
+                    const statusBadge = document.createElement("span");
+                    statusBadge.className = "status";
+                    statusBadge.textContent = application.status || "PENDING";
+
+                    statusLabel.textContent = "Status: ";
+                    statusLabel.appendChild(statusBadge);
+
+                    const appliedAt = document.createElement("p");
+                    appliedAt.className = "job-info";
+
+                    appliedAt.textContent =
+                        "Applied on: " +
+                        (application.appliedAt
+                            ? new Date(application.appliedAt).toLocaleString()
+                            : "Date unavailable");
+
+                    card.append(heading, jobInfo, statusLabel, appliedAt);
+                    applicationList.appendChild(card);
+                }
+            } catch (error) {
+                console.error("Error loading applications:", error);
+
+                applicationCount.textContent =
+                    "Could not load applications";
+
+                applicationList.innerHTML =
+                    '<div class="message">Unable to load applications. Please try again.</div>';
+            } finally {
+                refreshButton.disabled = false;
+            }
+        }
+
+        // Initial page loading.
+        loadJobs();
+        loadMyApplications();
+    }
+</script>
+
+</body>
+</html>
